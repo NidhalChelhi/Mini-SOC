@@ -34,11 +34,12 @@ Mini-SOC/
 │   ├── dashboard-overview-2.png
 │   ├── index-management.png
 │   ├── data-views.png
-│   └── alert-detail. png
+│   └── alert-detail.png
 │
 ├── diagrams/                         # Architecture diagrams
-│   └── architecture.txt
+│   ├── data-flow.png                 # Data flow diagram
+│   └── architecture.png              # System architecture diagram
 │
-├── scripts/                          # Installation/automation scripts (optional)
+├── scripts/                          # Installation/automation scripts (empty)
 │
 └── README.md                         # Main project documentation

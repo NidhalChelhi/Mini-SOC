@@ -144,9 +144,10 @@ La documentation complète se trouve dans le dossier `docs/`:
 
 ---
 
-## 👤 Auteur
+## 👤 Auteurs
 
 **Nidhal Chelhi**  
+**Rochdi Fridhi**
 Projet de Cybersécurité - Module sous la supervision de Houcemeddine HERMASSI
 
 ---

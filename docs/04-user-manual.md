@@ -1,1006 +1,737 @@
-\# Manuel Utilisateur - Mini-SOC Platform
+# Manuel Utilisateur - Mini-SOC Platform
 
-\## Table des Matières
+## Table des Matières
 
-1\. \[Introduction](#introduction)
-
-2\. \[Accès à la Plateforme](#accès-à-la-plateforme)
-
-3\. \[Navigation dans Kibana](#navigation-dans-kibana)
-
-4\. \[Utilisation du Dashboard](#utilisation-du-dashboard)
-
-5\. \[Analyse des Alertes](#analyse-des-alertes)
-
-6\. \[Réponse aux Incidents](#réponse-aux-incidents)
-
-7\. \[Maintenance Quotidienne](#maintenance-quotidienne)
-
-8\. \[Dépannage](#dépannage)
+1. [Introduction](#introduction)
+2. [Accès à la Plateforme](#accès-à-la-plateforme)
+3. [Navigation dans Kibana](#navigation-dans-kibana)
+4. [Utilisation du Dashboard](#utilisation-du-dashboard)
+5. [Analyse des Alertes](#analyse-des-alertes)
+6. [Réponse aux Incidents](#réponse-aux-incidents)
+7. [Maintenance Quotidienne](#maintenance-quotidienne)
+8. [Dépannage](#dépannage)
 
 ---
 
-\## Introduction
+## Introduction
 
-\### Qu'est-ce que le Mini-SOC?
+### Qu'est-ce que le Mini-SOC?
 
 Le Mini-SOC (Security Operations Center) est une plateforme de surveillance de sécurité qui combine:
 
-\- \*\*NIDS (Network IDS):\*\* Détection d'intrusions réseau via Suricata
+- **NIDS (Network IDS):** Détection d'intrusions réseau via Suricata
+- **HIDS (Host IDS):** Détection d'intrusions hôte via Wazuh
+- **SIEM:** Centralisation et visualisation via Elastic Stack
 
-\- \*\*HIDS (Host IDS):\*\* Détection d'intrusions hôte via Wazuh
-
-\- \*\*SIEM:\*\* Centralisation et visualisation via Elastic Stack
-
-\### Pour qui?
+### Pour qui?
 
 Ce manuel s'adresse aux:
 
-\- \*\*Analystes SOC:\*\* Pour surveiller les alertes de sécurité
-
-\- \*\*Administrateurs système:\*\* Pour maintenir la plateforme
-
-\- \*\*Responsables sécurité:\*\* Pour avoir une vue d'ensemble
+- **Analystes SOC:** Pour surveiller les alertes de sécurité
+- **Administrateurs système:** Pour maintenir la plateforme
+- **Responsables sécurité:** Pour avoir une vue d'ensemble
 
 ---
 
-\## Accès à la Plateforme
+## Accès à la Plateforme
 
-\### Connexion à Kibana
+### Connexion à Kibana
 
-\*\*URL d'accès:\*\*
+**URL d'accès:**
 
 ```
-
 http://192.168.229.143:5601
-
 ```
 
-\*\*Identifiants par défaut:\*\*
+**Identifiants par défaut:**
 
-\- \*\*Username:\*\* `elastic`
+- **Username:** `elastic`
+- **Password:** `[configuré lors de l'installation]`
 
-\- \*\*Password:\*\* `\[configuré lors de l'installation]`
+### Premier Accès
 
-\### Premier Accès
+1.  Ouvrir un navigateur web (Chrome, Firefox recommandés)
+2.  Entrer l'URL: `http://192.168.229.143:5601`
+3.  Saisir les identifiants
+4.  Cliquer sur **Log in**
 
-1\. Ouvrir un navigateur web (Chrome, Firefox recommandés)
+**Page d'accueil Kibana:**
 
-2\. Entrer l'URL: `http://192.168.229.143:5601`
-
-3\. Saisir les identifiants
-
-4\. Cliquer sur \*\*Log in\*\*
-
-\*\*Page d'accueil Kibana:\*\*
-
-\- Menu latéral gauche avec les différentes sections
-
-\- Barre de recherche en haut
-
-\- Contenu principal au centre
+- Menu latéral gauche avec les différentes sections
+- Barre de recherche en haut
+- Contenu principal au centre
 
 ---
 
-\## Navigation dans Kibana
+## Navigation dans Kibana
 
-\### Menu Principal
+### Menu Principal
 
-| Section | Description | Usage |
+| Section              | Description              | Usage                                   |
+| -------------------- | ------------------------ | --------------------------------------- |
+| **Discover**         | Explorer les logs bruts  | Recherche détaillée dans les événements |
+| **Dashboard**        | Tableaux de bord visuels | Vue d'ensemble des alertes              |
+| **Visualize**        | Créer des visualisations | Personnaliser les graphiques            |
+| **Alerts**           | Gestion des alertes      | Configuration des notifications         |
+| **Stack Management** | Administration           | Gérer indices, utilisateurs, etc.       |
 
-|---------|-------------|-------|
+### Raccourcis Clavier
 
-| \*\*Discover\*\* | Explorer les logs bruts | Recherche détaillée dans les événements |
-
-| \*\*Dashboard\*\* | Tableaux de bord visuels | Vue d'ensemble des alertes |
-
-| \*\*Visualize\*\* | Créer des visualisations | Personnaliser les graphiques |
-
-| \*\*Alerts\*\* | Gestion des alertes | Configuration des notifications |
-
-| \*\*Stack Management\*\* | Administration | Gérer indices, utilisateurs, etc. |
-
-\### Raccourcis Clavier
-
-| Touche | Action |
-
-|--------|--------|
-
-| `Ctrl + /` | Ouvrir la recherche |
-
+| Touche     | Action                   |
+| ---------- | ------------------------ |
+| `Ctrl + /` | Ouvrir la recherche      |
 | `Ctrl + K` | Barre de commande rapide |
-
-| `F5` | Rafraîchir les données |
-
----
-
-\## Utilisation du Dashboard
-
-\### Accéder au Dashboard Principal
-
-1\. Cliquer sur \*\*Dashboard\*\* dans le menu latéral
-
-2\. Sélectionner \*\*"Mini-SOC Main Dashboard"\*\*
-
-\### Composants du Dashboard
-
-\#### 1. Wazuh Alert Timeline
-
-\*\*Fonction:\*\* Affiche l'évolution temporelle des alertes Wazuh
-
-\*\*Interprétation:\*\*
-
-\- \*\*Pics soudains:\*\* Activité suspecte ou attaque en cours
-
-\- \*\*Ligne stable:\*\* Activité normale
-
-\- \*\*Absence d'alertes:\*\* Vérifier que les agents fonctionnent
-
-\*\*Actions:\*\*
-
-\- Cliquer sur un pic pour filtrer les alertes de cette période
-
-\- Ajuster l'intervalle de temps (Last 15 minutes, Last 24 hours, etc.)
-
-\#### 2. Total Alerts
-
-\*\*Fonction:\*\* Compteur du nombre total d'événements
-
-\*\*Interprétation:\*\*
-
-\- \*\*Nombre élevé (>1000/jour):\*\* Possible attaque ou faux positifs
-
-\- \*\*Nombre faible (<10/jour):\*\* Système calme ou agents déconnectés
-
-\#### 3. Attacking IPs
-
-\*\*Fonction:\*\* Liste des adresses IP sources des attaques
-
-\*\*Interprétation:\*\*
-
-\- \*\*IP externe inconnue:\*\* Attaque réelle potentielle → Investiguer
-
-\- \*\*IP interne (192.168.x.x):\*\* Possible compromission interne ou faux positif
-
-\- \*\*IP récurrente:\*\* Attaquant persistant → Bloquer
-
-\*\*Actions:\*\*
-
-\- Cliquer sur une IP pour voir tous ses événements
-
-\- Copier l'IP pour analyse externe (AbuseIPDB, VirusTotal)
-
-\#### 4. Alert Severity
-
-\*\*Fonction:\*\* Distribution des alertes par gravité
-
-\*\*Types d'alertes:\*\*
-
-\- \*\*syslog (~33%):\*\* Événements système généraux
-
-\- \*\*pam (~33%):\*\* Authentifications et accès
-
-\- \*\*authentication success (22%):\*\* Connexions réussies (monitoring)
-
-\- \*\*ossec (~11%):\*\* Alertes Wazuh spécifiques
-
-\*\*Interprétation:\*\*
-
-\- \*\*Pic dans "authentication":\*\* Tentatives de connexion multiples
-
-\- \*\*Augmentation "pam":\*\* Activité utilisateur inhabituelle
-
-\#### 5. Network Attack Signatures
-
-\*\*Fonction:\*\* Signatures d'attaques détectées par Suricata
-
-\*\*Exemples courants:\*\*
-
-\- \*\*"SURICATA HTTP unable to match response":\*\* Trafic HTTP anormal
-
-\- \*\*"ET INFO Http Client Body contains pastebin":\*\* Possible exfiltration
-
-\- \*\*"STREAM CLOSEWAIT FIN":\*\* Anomalie TCP
-
-\- \*\*"ICMPv4 unknown code":\*\* Scan réseau
-
-\*\*Actions:\*\*
-
-\- Cliquer sur une signature pour voir les détails
-
-\- Rechercher la signature sur Internet pour comprendre l'attaque
-
-\#### 6. Targeted Ports
-
-\*\*Fonction:\*\* Ports les plus ciblés par les attaques
-
-\*\*Ports critiques:\*\*
-
-\- \*\*Port 22 (SSH):\*\* Tentatives de connexion à distance
-
-\- \*\*Port 80/443 (HTTP/HTTPS):\*\* Attaques web
-
-\- \*\*Port 3389 (RDP):\*\* Connexion bureau à distance Windows
-
-\- \*\*Port 445 (SMB):\*\* Partage de fichiers Windows
-
-\*\*Interprétation:\*\*
-
-\- \*\*Port 22 en tête:\*\* Brute force SSH probable
-
-\- \*\*Ports élevés (>10000):\*\* Scans de découverte
+| `F5`       | Rafraîchir les données   |
 
 ---
 
-\## Analyse des Alertes
+## Utilisation du Dashboard
 
-\### Workflow d'Analyse
+### Accéder au Dashboard Principal
 
-```
+1. Cliquer sur **Dashboard** dans le menu latéral
+2. Sélectionner **"Mini-SOC Main Dashboard"**
 
-1\. Détection → 2. Investigation → 3. Classification → 4. Réponse
+### Composants du Dashboard
 
-```
+#### 1. Wazuh Alert Timeline
 
-\### Étape 1: Détection
+**Fonction:** Affiche l'évolution temporelle des alertes Wazuh
 
-\*\*Indicateurs d'alerte:\*\*
+**Interprétation:**
 
-\- Nombre total d'alertes soudainement élevé
+- **Pics soudains:** Activité suspecte ou attaque en cours
+- **Ligne stable:** Activité normale
+- **Absence d'alertes:** Vérifier que les agents fonctionnent
 
-\- Nouvelle IP dans "Attacking IPs"
+**Actions:**
 
-\- Signature d'attaque inconnue
+- Cliquer sur un pic pour filtrer les alertes de cette période
+- Ajuster l'intervalle de temps (Last 15 minutes, Last 24 hours, etc.)
 
-\### Étape 2: Investigation
+#### 2. Total Alerts
 
-\#### Utiliser Discover pour les détails
+**Fonction:** Compteur du nombre total d'événements
 
-1\. Aller dans \*\*Discover\*\*
+**Interprétation:**
 
-2\. Sélectionner le Data View:
+- **Nombre élevé (>1000/jour):** Possible attaque ou faux positifs
+- **Nombre faible (<10/jour):** Système calme ou agents déconnectés
 
-&nbsp; - `wazuh-alerts-\*` pour alertes hôtes
+#### 3. Attacking IPs
 
-&nbsp; - `suricata-\*` pour alertes réseau
+**Fonction:** Liste des adresses IP sources des attaques
 
-3\. Filtrer par période: Dernières 15 minutes
+**Interprétation:**
 
-4\. Rechercher l'IP ou la signature suspecte
+- **IP externe inconnue:** Attaque réelle potentielle → Investiguer
+- **IP interne (192.168.x.x):** Possible compromission interne ou faux positif
+- **IP récurrente:** Attaquant persistant → Bloquer
 
-\#### Exemple: Investiguer une IP suspecte
+**Actions:**
 
-\*\*Requête KQL:\*\*
+- Cliquer sur une IP pour voir tous ses événements
+- Copier l'IP pour analyse externe (AbuseIPDB, VirusTotal)
 
-```
+#### 4. Alert Severity
 
-src\_ip: "192.168.229.148"
+**Fonction:** Distribution des alertes par gravité
 
-```
+**Types d'alertes:**
 
-\*\*Champs importants à vérifier:\*\*
+- **syslog (~33%):** Événements système généraux
+- **pam (~33%):** Authentifications et accès
+- **authentication success (22%):** Connexions réussies (monitoring)
+- **ossec (~11%):** Alertes Wazuh spécifiques
 
-\- `src\_ip` / `dest\_ip`: Source et destination
+**Interprétation:**
 
-\- `src\_port` / `dest\_port`: Ports utilisés
+- **Pic dans "authentication":** Tentatives de connexion multiples
+- **Augmentation "pam":** Activité utilisateur inhabituelle
 
-\- `rule.description`: Description de l'alerte
+#### 5. Network Attack Signatures
 
-\- `rule.level`: Niveau de sévérité (0-15)
+**Fonction:** Signatures d'attaques détectées par Suricata
 
-\- `@timestamp`: Horodatage
+**Exemples courants:**
 
-\#### Exemple: Voir tous les échecs SSH
+- **"SURICATA HTTP unable to match response":** Trafic HTTP anormal
+- **"ET INFO Http Client Body contains pastebin":** Possible exfiltration
+- **"STREAM CLOSEWAIT FIN":** Anomalie TCP
+- **"ICMPv4 unknown code":** Scan réseau
 
-\*\*Requête KQL:\*\*
+**Actions:**
 
-```
+- Cliquer sur une signature pour voir les détails
+- Rechercher la signature sur Internet pour comprendre l'attaque
 
-rule.description: \*authentication\* AND \*failed\*
+#### 6. Targeted Ports
 
-```
+**Fonction:** Ports les plus ciblés par les attaques
 
-\### Étape 3: Classification
+**Ports critiques:**
 
-| Type | Gravité | Action |
+- **Port 22 (SSH):** Tentatives de connexion à distance
+- **Port 80/443 (HTTP/HTTPS):** Attaques web
+- **Port 3389 (RDP):** Connexion bureau à distance Windows
+- **Port 445 (SMB):** Partage de fichiers Windows
 
-|------|---------|--------|
+**Interprétation:**
 
-| \*\*Vrai Positif - Critique\*\* | Élevée | Réponse immédiate |
-
-| \*\*Vrai Positif - Mineur\*\* | Moyenne | Investigation approfondie |
-
-| \*\*Faux Positif\*\* | Faible | Ajuster les règles |
-
-| \*\*Test Interne\*\* | Info | Documenter |
-
-\### Étape 4: Réponse
-
-Voir section \[Réponse aux Incidents](#réponse-aux-incidents)
+- **Port 22 en tête:** Brute force SSH probable
+- **Ports élevés (>10000):** Scans de découverte
 
 ---
 
-\## Réponse aux Incidents
+## Analyse des Alertes
 
-\### Scénario 1: Brute Force SSH Détecté
+### Workflow d'Analyse
 
-\*\*Alerte:\*\* Nombreuses tentatives SSH échouées depuis une IP externe
+```
+1. Détection → 2. Investigation → 3. Classification → 4. Réponse
+```
 
-\*\*Actions:\*\*
+### Étape 1: Détection
 
-1\. \*\*Identifier la source\*\*
+**Indicateurs d'alerte:**
 
-&nbsp; ```
+- Nombre total d'alertes soudainement élevé
+- Nouvelle IP dans "Attacking IPs"
+- Signature d'attaque inconnue
 
-&nbsp; # Dans Kibana Discover
+### Étape 2: Investigation
 
-&nbsp; rule.description: \*sshd\* AND \*authentication\*
+#### Utiliser Discover pour les détails
 
-&nbsp; ```
+1. Aller dans **Discover**
+2. Sélectionner le Data View:
+   - `wazuh-alerts-*` pour alertes hôtes
+   - `suricata-*` pour alertes réseau
+3. Filtrer par période: Dernières 15 minutes
+4. Rechercher l'IP ou la signature suspecte
 
-2\. \*\*Bloquer l'IP (sur Linux Client)\*\*
+#### Exemple: Investiguer une IP suspecte
 
-&nbsp; ```bash
+**Requête KQL:**
 
-&nbsp; # Bloquer avec iptables
+```
+src_ip: "192.168.229.148"
+```
 
-&nbsp; sudo iptables -A INPUT -s \[IP_ATTAQUANT] -j DROP
+**Champs importants à vérifier:**
 
-&nbsp;
+- `src_ip` / `dest_ip`: Source et destination
+- `src_port` / `dest_port`: Ports utilisés
+- `rule.description`: Description de l'alerte
+- `rule.level`: Niveau de sévérité (0-15)
+- `@timestamp`: Horodatage
 
-&nbsp; # Ou avec UFW
+#### Exemple: Voir tous les échecs SSH
 
-&nbsp; sudo ufw deny from \[IP_ATTAQUANT]
+**Requête KQL:**
 
-&nbsp; ```
+```
+rule.description: *authentication* AND *failed*
+```
 
-3\. \*\*Vérifier les connexions réussies\*\*
+### Étape 3: Classification
 
-&nbsp; ```
+| Type                        | Gravité | Action                    |
+| --------------------------- | ------- | ------------------------- |
+| **Vrai Positif - Critique** | Élevée  | Réponse immédiate         |
+| **Vrai Positif - Mineur**   | Moyenne | Investigation approfondie |
+| **Faux Positif**            | Faible  | Ajuster les règles        |
+| **Test Interne**            | Info    | Documenter                |
 
-&nbsp; rule.description: \*authentication\* AND \*success\*
+### Étape 4: Réponse
 
-&nbsp; ```
-
-4\. \*\*Documenter l'incident\*\*
-
-\### Scénario 2: Scan de Ports Détecté
-
-\*\*Alerte:\*\* Suricata détecte un scan Nmap
-
-\*\*Actions:\*\*
-
-1\. \*\*Identifier la source dans Kibana\*\*
-
-&nbsp; ```
-
-&nbsp; alert.signature: \*SCAN\* OR \*nmap\*
-
-&nbsp; ```
-
-2\. \*\*Vérifier si des ports sensibles ont été découverts\*\*
-
-3\. \*\*Si IP externe: Bloquer l'IP\*\*
-
-&nbsp; ```bash
-
-&nbsp; # Sur le firewall/routeur
-
-&nbsp; sudo iptables -A INPUT -s \[IP_SCAN] -j DROP
-
-&nbsp; ```
-
-4\. \*\*Si IP interne: Investiguer la machine compromise\*\*
-
-\### Scénario 3: Attaque Web Détectée
-
-\*\*Alerte:\*\* Tentatives SQL Injection ou XSS
-
-\*\*Actions:\*\*
-
-1\. \*\*Identifier les requêtes malveillantes\*\*
-
-&nbsp; ```
-
-&nbsp; alert.signature: \*SQL\* OR \*XSS\* OR \*injection\*
-
-&nbsp; ```
-
-2\. \*\*Vérifier les logs Apache/Nginx\*\*
-
-&nbsp; ```bash
-
-&nbsp; # Sur le serveur web
-
-&nbsp; sudo tail -f /var/log/apache2/access.log
-
-&nbsp; ```
-
-3\. \*\*Bloquer l'IP attaquante\*\*
-
-4\. \*\*Patcher l'application vulnérable\*\*
-
-\### Scénario 4: Fichier Suspect Détecté
-
-\*\*Alerte:\*\* Wazuh détecte un fichier malveillant
-
-\*\*Actions:\*\*
-
-1\. \*\*Localiser le fichier\*\*
-
-&nbsp; ```
-
-&nbsp; rule.description: \*integrity\* OR \*file\*
-
-&nbsp; ```
-
-2\. \*\*Isoler la machine (si nécessaire)\*\*
-
-&nbsp; ```bash
-
-&nbsp; # Déconnecter du réseau
-
-&nbsp; sudo ifconfig ens33 down
-
-&nbsp; ```
-
-3\. \*\*Analyser le fichier\*\*
-
-&nbsp; ```bash
-
-&nbsp; # Vérifier le hash
-
-&nbsp; sha256sum \[fichier_suspect]
-
-&nbsp;
-
-&nbsp; # Rechercher sur VirusTotal
-
-&nbsp; ```
-
-4\. \*\*Supprimer ou mettre en quarantaine\*\*
+Voir section [Réponse aux Incidents](#réponse-aux-incidents)
 
 ---
 
-\## Maintenance Quotidienne
+## Réponse aux Incidents
 
-\### Checklist Journalière (Analyste SOC)
+### Scénario 1: Brute Force SSH Détecté
 
-\#### Matin (9h00)
+**Alerte:** Nombreuses tentatives SSH échouées depuis une IP externe
 
-\- \[ ] \*\*Vérifier le Dashboard\*\*
+**Actions:**
 
-&nbsp; - Total des alertes dernières 24h
+1. **Identifier la source**
 
-&nbsp; - Nouvelles IPs attaquantes
+   ```
+   # Dans Kibana Discover
+   rule.description: *sshd* AND *authentication*
+   ```
 
-&nbsp; - Anomalies dans les graphiques
+2. **Bloquer l'IP (sur Linux Client)**
 
-\- \[ ] \*\*Vérifier les agents Wazuh\*\*
+   ```bash
+   # Bloquer avec iptables
+   sudo iptables -A INPUT -s [IP_ATTAQUANT] -j DROP
 
-&nbsp; ```bash
+   # Ou avec UFW
+   sudo ufw deny from [IP_ATTAQUANT]
+   ```
 
-&nbsp; # Sur Wazuh Manager
+3. **Vérifier les connexions réussies**
 
-&nbsp; ssh socadmin@192.168.229.146
+   ```
+   rule.description: *authentication* AND *success*
+   ```
 
-&nbsp; sudo /var/ossec/bin/agent_control -l
+4. **Documenter l'incident**
 
-&nbsp; ```
+### Scénario 2: Scan de Ports Détecté
 
-&nbsp; Résultat attendu: Tous les agents "Active"
+**Alerte:** Suricata détecte un scan Nmap
 
-\- \[ ] \*\*Vérifier Suricata\*\*
+**Actions:**
 
-&nbsp; ```bash
+1. **Identifier la source dans Kibana**
 
-&nbsp; # Sur Suricata VM
+   ```
+   alert.signature: *SCAN* OR *nmap*
+   ```
 
-&nbsp; ssh socadmin@192.168.229.147
+2. **Vérifier si des ports sensibles ont été découverts**
 
-&nbsp; sudo systemctl status suricata
+3. **Si IP externe: Bloquer l'IP**
 
-&nbsp; sudo tail -20 /var/log/suricata/fast.log
+   ```bash
+   # Sur le firewall/routeur
+   sudo iptables -A INPUT -s [IP_SCAN] -j DROP
+   ```
 
-&nbsp; ```
+4. **Si IP interne: Investiguer la machine compromise**
 
-\- \[ ] \*\*Vérifier Elasticsearch\*\*
+### Scénario 3: Attaque Web Détectée
 
-&nbsp; ```bash
+**Alerte:** Tentatives SQL Injection ou XSS
 
-&nbsp; # Sur Elastic VM
+**Actions:**
 
-&nbsp; ssh socadmin@192.168.229.143
+1. **Identifier les requêtes malveillantes**
 
-&nbsp; curl -u elastic:PASSWORD http://localhost:9200/\_cluster/health? pretty
+   ```
+   alert.signature: *SQL* OR *XSS* OR *injection*
+   ```
 
-&nbsp; ```
+2. **Vérifier les logs Apache/Nginx**
 
-&nbsp; Résultat attendu: `"status" : "green"` ou `"yellow"`
+   ```bash
+   # Sur le serveur web
+   sudo tail -f /var/log/apache2/access.log
+   ```
 
-\#### Après-midi (14h00)
+3. **Bloquer l'IP attaquante**
 
-\- \[ ] \*\*Analyser les alertes prioritaires\*\*
+4. **Patcher l'application vulnérable**
 
-&nbsp; - Filtrer par niveau: `rule.level >= 10`
+### Scénario 4: Fichier Suspect Détecté
 
-&nbsp; - Investiguer chaque alerte critique
+**Alerte:** Wazuh détecte un fichier malveillant
 
-\- \[ ] \*\*Mettre à jour les règles Suricata\*\*
+**Actions:**
 
-&nbsp; ```bash
+1. **Localiser le fichier**
 
-&nbsp; # Sur Suricata VM
+   ```
+   rule.description: *integrity* OR *file*
+   ```
 
-&nbsp; sudo suricata-update
+2. **Isoler la machine (si nécessaire)**
 
-&nbsp; sudo systemctl restart suricata
+   ```bash
+   # Déconnecter du réseau
+   sudo ifconfig ens33 down
+   ```
 
-&nbsp; ```
+3. **Analyser le fichier**
 
-\#### Fin de journée (17h00)
+   ```bash
+   # Vérifier le hash
+   sha256sum [fichier_suspect]
 
-\- \[ ] \*\*Rapport quotidien\*\*
+   # Rechercher sur VirusTotal
+   ```
 
-&nbsp; - Nombre total d'alertes
-
-&nbsp; - Incidents traités
-
-&nbsp; - Actions prises
-
-&nbsp; - Points d'attention pour demain
+4. **Supprimer ou mettre en quarantaine**
 
 ---
 
-\### Checklist Hebdomadaire (Administrateur)
+## Maintenance Quotidienne
 
-\#### Lundi
+### Checklist Journalière (Analyste SOC)
 
-\- \[ ] \*\*Nettoyer les anciens indices Elasticsearch\*\*
+#### Matin (9h00)
 
-&nbsp; ```bash
+- [ ] **Vérifier le Dashboard**
 
-&nbsp; # Supprimer les indices de plus de 30 jours
+  - Total des alertes dernières 24h
+  - Nouvelles IPs attaquantes
+  - Anomalies dans les graphiques
 
-&nbsp; curl -u elastic:PASSWORD -X DELETE "http://192.168.229.143:9200/wazuh-alerts-2025-12-\*"
+- [ ] **Vérifier les agents Wazuh**
 
-&nbsp; ```
+  ```bash
+  # Sur Wazuh Manager
+  ssh socadmin@192.168.229.146
+  sudo /var/ossec/bin/agent_control -l
+  ```
 
-\- \[ ] \*\*Sauvegarder les configurations\*\*
+  Résultat attendu: Tous les agents "Active"
 
-&nbsp; ```bash
+- [ ] **Vérifier Suricata**
 
-&nbsp; # Sur chaque VM
+  ```bash
+  # Sur Suricata VM
+  ssh socadmin@192.168.229.147
+  sudo systemctl status suricata
+  sudo tail -20 /var/log/suricata/fast.log
+  ```
 
-&nbsp; tar -czf /home/socadmin/backup-$(date +%F).tar.gz /etc/
+- [ ] **Vérifier Elasticsearch**
+  ```bash
+  # Sur Elastic VM
+  ssh socadmin@192.168.229.143
+  curl -u elastic:PASSWORD http://localhost:9200/_cluster/health? pretty
+  ```
+  Résultat attendu: `"status" : "green"` ou `"yellow"`
 
-&nbsp; ```
+#### Après-midi (14h00)
 
-\#### Mercredi
+- [ ] **Analyser les alertes prioritaires**
 
-\- \[ ] \*\*Mettre à jour le système\*\*
+  - Filtrer par niveau: `rule.level >= 10`
+  - Investiguer chaque alerte critique
 
-&nbsp; ```bash
+- [ ] **Mettre à jour les règles Suricata**
+  ```bash
+  # Sur Suricata VM
+  sudo suricata-update
+  sudo systemctl restart suricata
+  ```
 
-&nbsp; sudo apt update \&\& sudo apt upgrade -y
+#### Fin de journée (17h00)
 
-&nbsp; ```
-
-\#### Vendredi
-
-\- \[ ] \*\*Vérifier les performances\*\*
-
-&nbsp; ```bash
-
-&nbsp; # CPU, RAM, Disk
-
-&nbsp; top
-
-&nbsp; df -h
-
-&nbsp; free -m
-
-&nbsp; ```
-
-\- \[ ] \*\*Exporter le dashboard Kibana\*\*
-
-&nbsp; - Stack Management → Saved Objects → Export
+- [ ] **Rapport quotidien**
+  - Nombre total d'alertes
+  - Incidents traités
+  - Actions prises
+  - Points d'attention pour demain
 
 ---
 
-\## Dépannage
+### Checklist Hebdomadaire (Administrateur)
 
-\### Problème: Pas d'alertes dans Kibana
+#### Lundi
 
-\*\*Diagnostic:\*\*
+- [ ] **Nettoyer les anciens indices Elasticsearch**
 
-1\. \*\*Vérifier les indices\*\*
+  ```bash
+  # Supprimer les indices de plus de 30 jours
+  curl -u elastic:PASSWORD -X DELETE "http://192.168.229.143:9200/wazuh-alerts-2025-12-*"
+  ```
 
-&nbsp; ```bash
+- [ ] **Sauvegarder les configurations**
+  ```bash
+  # Sur chaque VM
+  tar -czf /home/socadmin/backup-$(date +%F).tar.gz /etc/
+  ```
 
-&nbsp; curl -u elastic:PASSWORD "http://192.168.229.143:9200/\_cat/indices?v"
+#### Mercredi
 
-&nbsp; ```
+- [ ] **Mettre à jour le système**
+  ```bash
+  sudo apt update && sudo apt upgrade -y
+  ```
 
-&nbsp; → Doit afficher `wazuh-alerts-\*` et `suricata-\*`
+#### Vendredi
 
-2\. \*\*Vérifier Filebeat sur Wazuh Manager\*\*
+- [ ] **Vérifier les performances**
 
-&nbsp; ```bash
+  ```bash
+  # CPU, RAM, Disk
+  top
+  df -h
+  free -m
+  ```
 
-&nbsp; ssh socadmin@192.168.229.146
+- [ ] **Exporter le dashboard Kibana**
+  - Stack Management → Saved Objects → Export
 
-&nbsp; sudo systemctl status filebeat
+---
 
-&nbsp; sudo tail -50 /var/log/filebeat/filebeat
+## Dépannage
 
-&nbsp; ```
+### Problème: Pas d'alertes dans Kibana
 
-3\. \*\*Vérifier Filebeat sur Suricata\*\*
+**Diagnostic:**
 
-&nbsp; ```bash
+1. **Vérifier les indices**
 
-&nbsp; ssh socadmin@192.168.229.147
+   ```bash
+   curl -u elastic:PASSWORD "http://192.168.229.143:9200/_cat/indices?v"
+   ```
 
-&nbsp; sudo systemctl status filebeat
+   → Doit afficher `wazuh-alerts-*` et `suricata-*`
 
-&nbsp; ```
+2. **Vérifier Filebeat sur Wazuh Manager**
 
-\*\*Solution:\*\*
+   ```bash
+   ssh socadmin@192.168.229.146
+   sudo systemctl status filebeat
+   sudo tail -50 /var/log/filebeat/filebeat
+   ```
+
+3. **Vérifier Filebeat sur Suricata**
+   ```bash
+   ssh socadmin@192.168.229.147
+   sudo systemctl status filebeat
+   ```
+
+**Solution:**
 
 ```bash
-
-\# Redémarrer Filebeat
-
+# Redémarrer Filebeat
 sudo systemctl restart filebeat
 
-
-
-\# Tester la connexion à Elasticsearch
-
+# Tester la connexion à Elasticsearch
 sudo filebeat test output
-
 ```
 
 ---
 
-\### Problème: Agent Wazuh déconnecté
+### Problème: Agent Wazuh déconnecté
 
-\*\*Diagnostic:\*\*
+**Diagnostic:**
 
 ```bash
-
-\# Sur Wazuh Manager
-
-sudo /var/ossec/bin/agent\_control -l
-
+# Sur Wazuh Manager
+sudo /var/ossec/bin/agent_control -l
 ```
 
 Si un agent est "Disconnected":
 
-\*\*Solution:\*\*
+**Solution:**
 
 ```bash
-
-\# Sur l'agent déconnecté (ex: Linux Client)
-
+# Sur l'agent déconnecté (ex: Linux Client)
 ssh socadmin@192.168.229.145
-
 sudo systemctl status wazuh-agent
 
-
-
-\# Redémarrer l'agent
-
+# Redémarrer l'agent
 sudo systemctl restart wazuh-agent
 
-
-
-\# Vérifier les logs
-
+# Vérifier les logs
 sudo tail -50 /var/ossec/logs/ossec.log
-
 ```
 
 ---
 
-\### Problème: Suricata ne génère pas d'alertes
+### Problème: Suricata ne génère pas d'alertes
 
-\*\*Diagnostic:\*\*
+**Diagnostic:**
 
 ```bash
-
-\# Sur Suricata VM
-
+# Sur Suricata VM
 sudo systemctl status suricata
-
 sudo tail -50 /var/log/suricata/suricata.log
-
 ```
 
-\*\*Vérifier l'interface réseau:\*\*
+**Vérifier l'interface réseau:**
 
 ```bash
-
 ip a
+# Noter le nom de l'interface (ex: ens33)
 
-\# Noter le nom de l'interface (ex: ens33)
-
-
-
-\# Vérifier dans la config
-
+# Vérifier dans la config
 sudo grep "interface:" /etc/suricata/suricata.yaml
-
 ```
 
-\*\*Solution:\*\*
+**Solution:**
 
 ```bash
-
-\# Éditer la config si nécessaire
-
+# Éditer la config si nécessaire
 sudo nano /etc/suricata/suricata.yaml
 
-
-
-\# Redémarrer Suricata
-
+# Redémarrer Suricata
 sudo systemctl restart suricata
 
-
-
-\# Tester avec un ping
-
+# Tester avec un ping
 ping -c 5 192.168.229.145
-
-\# Vérifier les logs
-
+# Vérifier les logs
 sudo tail -f /var/log/suricata/fast.log
-
 ```
 
 ---
 
-\### Problème: Kibana inaccessible
+### Problème: Kibana inaccessible
 
-\*\*Diagnostic:\*\*
+**Diagnostic:**
 
 ```bash
-
-\# Sur Elastic VM
-
+# Sur Elastic VM
 ssh socadmin@192.168.229.143
-
 sudo systemctl status kibana
-
 sudo systemctl status elasticsearch
-
 ```
 
-\*\*Solution:\*\*
+**Solution:**
 
 ```bash
-
-\# Redémarrer les services
-
+# Redémarrer les services
 sudo systemctl restart elasticsearch
-
-\# Attendre 30 secondes
-
+# Attendre 30 secondes
 sudo systemctl restart kibana
 
-
-
-\# Vérifier les logs
-
+# Vérifier les logs
 sudo journalctl -u kibana -f
-
 ```
 
 ---
 
-\### Problème: Espace disque saturé
+### Problème: Espace disque saturé
 
-\*\*Diagnostic:\*\*
+**Diagnostic:**
 
 ```bash
-
 df -h
-
 ```
 
 Si `/` est > 90% plein:
 
-\*\*Solution:\*\*
+**Solution:**
 
 ```bash
-
-\# Supprimer les anciens logs
-
+# Supprimer les anciens logs
 sudo journalctl --vacuum-time=7d
 
+# Supprimer les anciens indices Elasticsearch
+curl -u elastic:PASSWORD -X DELETE "http://localhost:9200/wazuh-alerts-2025-11-*"
 
-
-\# Supprimer les anciens indices Elasticsearch
-
-curl -u elastic:PASSWORD -X DELETE "http://localhost:9200/wazuh-alerts-2025-11-\*"
-
-
-
-\# Nettoyer les paquets
-
+# Nettoyer les paquets
 sudo apt autoremove -y
-
 sudo apt clean
-
 ```
 
 ---
 
-\## Bonnes Pratiques
+## Bonnes Pratiques
 
-\### Sécurité
+### Sécurité
 
-1\. \*\*Changer les mots de passe par défaut\*\*
+1. **Changer les mots de passe par défaut**
 
-&nbsp; ```bash
+   ```bash
+   # Sur Elastic VM
+   sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+   ```
 
-&nbsp; # Sur Elastic VM
+2. **Activer HTTPS pour Kibana** (production)
 
-&nbsp; sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+3. **Restreindre l'accès par IP**
+   ```bash
+   # Firewall UFW
+   sudo ufw allow from 192.168.229.0/24 to any port 5601
+   ```
 
-&nbsp; ```
+### Performance
 
-2\. \*\*Activer HTTPS pour Kibana\*\* (production)
+1. **Rotation automatique des indices**
 
-3\. \*\*Restreindre l'accès par IP\*\*
+   - Configurer ILM (Index Lifecycle Management) dans Elasticsearch
 
-&nbsp; ```bash
+2. **Limiter la rétention des logs**
 
-&nbsp; # Firewall UFW
+   - Conserver 30 jours maximum
 
-&nbsp; sudo ufw allow from 192.168.229.0/24 to any port 5601
+3. **Monitorer les ressources**
+   - CPU < 80%
+   - RAM < 90%
+   - Disk < 85%
 
-&nbsp; ```
+### Documentation
 
-\### Performance
-
-1\. \*\*Rotation automatique des indices\*\*
-
-&nbsp; - Configurer ILM (Index Lifecycle Management) dans Elasticsearch
-
-2\. \*\*Limiter la rétention des logs\*\*
-
-&nbsp; - Conserver 30 jours maximum
-
-3\. \*\*Monitorer les ressources\*\*
-
-&nbsp; - CPU < 80%
-
-&nbsp; - RAM < 90%
-
-&nbsp; - Disk < 85%
-
-\### Documentation
-
-1\. \*\*Tenir un journal des incidents\*\*
-
-2\. \*\*Documenter toutes les modifications de config\*\*
-
-3\. \*\*Mettre à jour ce manuel si nécessaire\*\*
+1. **Tenir un journal des incidents**
+2. **Documenter toutes les modifications de config**
+3. **Mettre à jour ce manuel si nécessaire**
 
 ---
 
-\## Contact et Support
+## Contact et Support
 
-\*\*Responsable du projet:\*\*
-
+**Responsable du projet:**  
 Houcemeddine HERMASSI
 
-\*\*Administrateurs système:\*\*
+**Administrateurs système:**  
+Nidhal Chelhi et Rochdi Fridhi
 
-Nidhal Chelhi
-Rochdi Fridhi
+**Documentation:**
 
-\*\*Documentation:\*\*
-
-\- Configuration: `docs/02-configuration-guide.md`
-
-\- Tests: `docs/03-testing-guide.md`
-
-\- GitHub: \[Lien vers le repository]
+- Configuration: `docs/02-configuration-guide.md`
+- Tests: `docs/03-testing-guide.md`
+- GitHub: [Lien vers le repository]
 
 ---
 
-\## Glossaire
+## Glossaire
 
-| Terme | Définition |
-
-|-------|------------|
-
-| \*\*NIDS\*\* | Network Intrusion Detection System - Détecte les intrusions sur le réseau |
-
-| \*\*HIDS\*\* | Host Intrusion Detection System - Détecte les intrusions sur les hôtes |
-
-| \*\*SIEM\*\* | Security Information and Event Management - Centralise et analyse les logs de sécurité |
-
-| \*\*SOC\*\* | Security Operations Center - Centre de supervision de la sécurité |
-
-| \*\*IDS\*\* | Intrusion Detection System - Système de détection d'intrusions |
-
-| \*\*FIM\*\* | File Integrity Monitoring - Surveillance de l'intégrité des fichiers |
-
-| \*\*Rule\*\* | Règle de détection configurée dans Suricata ou Wazuh |
-
-| \*\*Alert\*\* | Événement de sécurité déclenché par une règle |
-
-| \*\*Index\*\* | Base de données dans Elasticsearch contenant les logs |
-
-| \*\*Data View\*\* | Vue logique des indices dans Kibana |
+| Terme         | Définition                                                                             |
+| ------------- | -------------------------------------------------------------------------------------- |
+| **NIDS**      | Network Intrusion Detection System - Détecte les intrusions sur le réseau              |
+| **HIDS**      | Host Intrusion Detection System - Détecte les intrusions sur les hôtes                 |
+| **SIEM**      | Security Information and Event Management - Centralise et analyse les logs de sécurité |
+| **SOC**       | Security Operations Center - Centre de supervision de la sécurité                      |
+| **IDS**       | Intrusion Detection System - Système de détection d'intrusions                         |
+| **FIM**       | File Integrity Monitoring - Surveillance de l'intégrité des fichiers                   |
+| **Rule**      | Règle de détection configurée dans Suricata ou Wazuh                                   |
+| **Alert**     | Événement de sécurité déclenché par une règle                                          |
+| **Index**     | Base de données dans Elasticsearch contenant les logs                                  |
+| **Data View** | Vue logique des indices dans Kibana                                                    |
 
 ---
 
-\## Annexes
+## Annexes
 
-\### Annexe A: Ports Utilisés
+### Annexe A: Ports Utilisés
 
-| Service | Port | Protocole |
+| Service       | Port | Protocole |
+| ------------- | ---- | --------- |
+| Elasticsearch | 9200 | HTTP      |
+| Kibana        | 5601 | HTTP      |
+| Wazuh Manager | 1514 | TCP       |
+| Wazuh Manager | 1515 | TCP       |
+| SSH           | 22   | TCP       |
 
-|---------|------|-----------|
+### Annexe B: Fichiers de Configuration
 
-| Elasticsearch | 9200 | HTTP |
-
-| Kibana | 5601 | HTTP |
-
-| Wazuh Manager | 1514 | TCP |
-
-| Wazuh Manager | 1515 | TCP |
-
-| SSH | 22 | TCP |
-
-\### Annexe B: Fichiers de Configuration
-
-| Composant | Fichier de Configuration |
-
-|-----------|--------------------------|
-
+| Composant     | Fichier de Configuration               |
+| ------------- | -------------------------------------- |
 | Elasticsearch | `/etc/elasticsearch/elasticsearch.yml` |
+| Kibana        | `/etc/kibana/kibana. yml`              |
+| Wazuh Manager | `/var/ossec/etc/ossec.conf`            |
+| Wazuh Agent   | `/var/ossec/etc/ossec.conf`            |
+| Suricata      | `/etc/suricata/suricata.yaml`          |
+| Filebeat      | `/etc/filebeat/filebeat.yml`           |
 
-| Kibana | `/etc/kibana/kibana. yml` |
+### Annexe C: Logs Importants
 
-| Wazuh Manager | `/var/ossec/etc/ossec.conf` |
-
-| Wazuh Agent | `/var/ossec/etc/ossec.conf` |
-
-| Suricata | `/etc/suricata/suricata.yaml` |
-
-| Filebeat | `/etc/filebeat/filebeat.yml` |
-
-\### Annexe C: Logs Importants
-
-| Composant | Emplacement des Logs |
-
-|-----------|----------------------|
-
-| Elasticsearch | `/var/log/elasticsearch/` |
-
-| Kibana | `/var/log/kibana/` |
-
-| Wazuh Manager | `/var/ossec/logs/` |
-
-| Wazuh Agent | `/var/ossec/logs/ossec.log` |
-
-| Suricata | `/var/log/suricata/` |
-
-| Filebeat | `/var/log/filebeat/` |
+| Composant     | Emplacement des Logs        |
+| ------------- | --------------------------- |
+| Elasticsearch | `/var/log/elasticsearch/`   |
+| Kibana        | `/var/log/kibana/`          |
+| Wazuh Manager | `/var/ossec/logs/`          |
+| Wazuh Agent   | `/var/ossec/logs/ossec.log` |
+| Suricata      | `/var/log/suricata/`        |
+| Filebeat      | `/var/log/filebeat/`        |
 
 ---
 
-\*\*Fin du Manuel Utilisateur\*\*
+**Fin du Manuel Utilisateur**
 
 ---
 
-\*Dernière mise à jour: Janvier 2026\*
-
-\*Version: 1.0\*
+_Dernière mise à jour: Janvier 2026_  
+_Version: 1.0_

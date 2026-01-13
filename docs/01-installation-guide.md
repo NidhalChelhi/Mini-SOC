@@ -1,625 +1,425 @@
-\# Guide d'Installation - Mini-SOC Platform
+# Guide d'Installation - Mini-SOC Platform
 
-\## Table des Matières
+## Table des Matières
 
-1\. \[Prérequis](#prérequis)
-
-2\. \[Installation Elastic Stack](#installation-elastic-stack)
-
-3\. \[Installation Wazuh Manager](#installation-wazuh-manager)
-
-4\. \[Installation Suricata](#installation-suricata)
-
-5\. \[Installation Wazuh Agent](#installation-wazuh-agent)
-
-6\. \[Installation Filebeat](#installation-filebeat)
+1. [Prérequis](#prérequis)
+2. [Installation Elastic Stack](#installation-elastic-stack)
+3. [Installation Wazuh Manager](#installation-wazuh-manager)
+4. [Installation Suricata](#installation-suricata)
+5. [Installation Wazuh Agent](#installation-wazuh-agent)
+6. [Installation Filebeat](#installation-filebeat)
 
 ---
 
-\## Prérequis
+## Prérequis
 
-\### Infrastructure Requise
+### Infrastructure Requise
 
-\- \*\*Hyperviseur:\*\* VMware Workstation
+- **Hyperviseur:** VMware Workstation
+- **Réseau:** 192.168.229.0/24 (NAT ou Bridge)
+- **RAM totale:** Minimum 16 GB
+- **Stockage:** Minimum 100 GB
 
-\- \*\*Réseau:\*\* 192.168.229.0/24 (NAT ou Bridge)
+### VMs à Créer
 
-\- \*\*RAM totale:\*\* Minimum 16 GB
-
-\- \*\*Stockage:\*\* Minimum 100 GB
-
-\### VMs à Créer
-
-| VM | OS | RAM | CPU | Stockage |
-
-|----|-----|-----|-----|----------|
-
-| Elastic Stack | Ubuntu Server 22.04 | 4 GB | 2 | 30 GB |
-
-| Wazuh Manager | Ubuntu Server 22.04 | 2 GB | 2 | 20 GB |
-
-| Suricata NIDS | Ubuntu Server 22.04 | 2 GB | 2 | 20 GB |
-
-| Linux Client | Ubuntu Server 22.04 | 2 GB | 1 | 20 GB |
-
-| Kali Linux | Kali Linux 2024 | 4 GB | 2 | 30 GB |
+| VM            | OS                  | RAM  | CPU | Stockage |
+| ------------- | ------------------- | ---- | --- | -------- |
+| Elastic Stack | Ubuntu Server 22.04 | 4 GB | 2   | 30 GB    |
+| Wazuh Manager | Ubuntu Server 22.04 | 2 GB | 2   | 20 GB    |
+| Suricata NIDS | Ubuntu Server 22.04 | 2 GB | 2   | 20 GB    |
+| Linux Client  | Ubuntu Server 22.04 | 2 GB | 1   | 20 GB    |
+| Kali Linux    | Kali Linux 2024     | 4 GB | 2   | 30 GB    |
 
 ---
 
-\## Installation Elastic Stack
+## Installation Elastic Stack
 
-\*\*VM:\*\* 192.168.229.143
+**VM:** 192.168.229.143  
+**User:** socadmin / socadmin
 
-\*\*User:\*\* socadmin / socadmin
-
-\### 1. Mise à jour du système
+### 1. Mise à jour du système
 
 ```bash
-
-sudo apt update \&\& sudo apt upgrade -y
-
+sudo apt update && sudo apt upgrade -y
 ```
 
-\### 2. Installation des dépendances
+### 2. Installation des dépendances
 
 ```bash
-
 sudo apt install curl wget apt-transport-https -y
-
 ```
 
-\### 3. Installation d'Elasticsearch
+### 3. Installation d'Elasticsearch
 
 ```bash
-
-\# Importer la clé GPG
-
+# Importer la clé GPG
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
 
+# Ajouter le dépôt Elastic
+echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list. d/elastic-8.x. list
 
-
-\# Ajouter le dépôt Elastic
-
-echo "deb \[signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list. d/elastic-8.x. list
-
-
-
-\# Installer Elasticsearch
-
+# Installer Elasticsearch
 sudo apt update
-
 sudo apt install elasticsearch -y
-
 ```
 
-\### 4. Configuration d'Elasticsearch
+### 4. Configuration d'Elasticsearch
 
 Éditer `/etc/elasticsearch/elasticsearch.yml`:
 
 ```yaml
 cluster.name: mini-soc-cluster
-
 node.name: elastic-node-1
-
 network.host: 192.168.229.143
-
 http.port: 9200
-
 discovery.type: single-node
-
 xpack.security.enabled: true
 ```
 
-\### 5. Démarrer Elasticsearch
+### 5. Démarrer Elasticsearch
 
 ```bash
-
 sudo systemctl daemon-reload
-
 sudo systemctl enable elasticsearch
-
 sudo systemctl start elasticsearch
-
 sudo systemctl status elasticsearch
-
 ```
 
-\### 6. Configurer le mot de passe Elasticsearch
+### 6. Configurer le mot de passe Elasticsearch
 
 ```bash
-
 sudo /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
-
-\# Sauvegarder le mot de passe généré
-
+# Sauvegarder le mot de passe généré
 ```
 
-\### 7. Installation de Kibana
+### 7. Installation de Kibana
 
 ```bash
-
 sudo apt install kibana -y
-
 ```
 
-\### 8. Configuration de Kibana
+### 8. Configuration de Kibana
 
 Éditer `/etc/kibana/kibana.yml`:
 
 ```yaml
 server.port: 5601
-
 server.host: "192.168.229.143"
-
-elasticsearch.hosts: \["http://192.168.229.143:9200"]
-
+elasticsearch.hosts: ["http://192.168.229.143:9200"]
 elasticsearch.username: "elastic"
-
-elasticsearch.password: "YOUR\_ELASTIC\_PASSWORD"
+elasticsearch.password: "YOUR_ELASTIC_PASSWORD"
 ```
 
-\### 9. Démarrer Kibana
+### 9. Démarrer Kibana
 
 ```bash
-
 sudo systemctl daemon-reload
-
 sudo systemctl enable kibana
-
 sudo systemctl start kibana
-
 sudo systemctl status kibana
-
 ```
 
-\### 10. Vérification
+### 10. Vérification
 
 Accéder à Kibana: `http://192.168.229.143:5601`
 
 ---
 
-\## Installation Wazuh Manager
+## Installation Wazuh Manager
 
-\*\*VM:\*\* 192.168.229.146
+**VM:** 192.168.229.146  
+**User:** socadmin / socadmin
 
-\*\*User:\*\* socadmin / socadmin
-
-\### 1. Mise jour du système
+### 1. Mise �� jour du système
 
 ```bash
-
-sudo apt update \&\& sudo apt upgrade -y
-
+sudo apt update && sudo apt upgrade -y
 ```
 
-\### 2. Installation de Wazuh Manager
+### 2. Installation de Wazuh Manager
 
 ```bash
+# Importer la clé GPG
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh. gpg --import && chmod 644 /usr/share/keyrings/wazuh. gpg
 
-\# Importer la clé GPG
+# Ajouter le dépôt Wazuh
+echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources. list.d/wazuh. list
 
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh. gpg --import \&\& chmod 644 /usr/share/keyrings/wazuh. gpg
-
-
-
-\# Ajouter le dépôt Wazuh
-
-echo "deb \[signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources. list.d/wazuh. list
-
-
-
-\# Installer Wazuh Manager
-
+# Installer Wazuh Manager
 sudo apt update
-
 sudo apt install wazuh-manager -y
-
 ```
 
-\### 3. Démarrer Wazuh Manager
+### 3. Démarrer Wazuh Manager
 
 ```bash
-
 sudo systemctl daemon-reload
-
 sudo systemctl enable wazuh-manager
-
 sudo systemctl start wazuh-manager
-
 sudo systemctl status wazuh-manager
-
 ```
 
-\### 4. Vérifier l'installation
+### 4. Vérifier l'installation
 
 ```bash
-
 sudo /var/ossec/bin/wazuh-control status
-
 ```
 
 ---
 
-\## Installation Suricata
+## Installation Suricata
 
-\*\*VM:\*\* 192.168.229.147
+**VM:** 192.168.229.147  
+**User:** socadmin / socadmin
 
-\*\*User:\*\* socadmin / socadmin
-
-\### 1. Mise à jour du système
+### 1. Mise à jour du système
 
 ```bash
-
-sudo apt update \&\& sudo apt upgrade -y
-
+sudo apt update && sudo apt upgrade -y
 ```
 
-\### 2. Installation de Suricata
+### 2. Installation de Suricata
 
 ```bash
-
 sudo add-apt-repository ppa: oisf/suricata-stable -y
-
 sudo apt update
-
 sudo apt install suricata -y
-
 ```
 
-\### 3. Configuration de Suricata
+### 3. Configuration de Suricata
 
 Éditer `/etc/suricata/suricata.yaml`:
 
 ```yaml
-
-\# Définir l'interface réseau à surveiller
-
+# Définir l'interface réseau à surveiller
 af-packet:
+  - interface: ens33 # Adapter selon votre interface
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
 
-&nbsp; - interface: ens33  # Adapter selon votre interface
-
-&nbsp;   cluster-id: 99
-
-&nbsp;   cluster-type: cluster\_flow
-
-&nbsp;   defrag: yes
-
-
-
-\# Définir les réseaux à protéger
-
+# Définir les réseaux à protéger
 vars:
-
-&nbsp; address-groups:
-
-&nbsp;   HOME\_NET:  "\[192.168.229.0/24]"
-
-&nbsp;   EXTERNAL\_NET:  "!$HOME\_NET"
-
+  address-groups:
+    HOME_NET: "[192.168.229.0/24]"
+    EXTERNAL_NET: "!$HOME_NET"
 ```
 
-\### 4. Mettre à jour les règles Suricata
+### 4. Mettre à jour les règles Suricata
 
 ```bash
-
 sudo suricata-update
-
 sudo suricata-update list-sources
-
 sudo suricata-update enable-source et/open
-
 sudo suricata-update
-
 ```
 
-\### 5. Démarrer Suricata
+### 5. Démarrer Suricata
 
 ```bash
-
 sudo systemctl enable suricata
-
 sudo systemctl start suricata
-
 sudo systemctl status suricata
-
 ```
 
-\### 6. Vérifier les logs
+### 6. Vérifier les logs
 
 ```bash
-
 sudo tail -f /var/log/suricata/fast.log
-
 ```
 
 ---
 
-\## Installation Wazuh Agent
+## Installation Wazuh Agent
 
-\*\*VM:\*\* Linux Client-1 (192.168.229.145)
+**VM:** Linux Client-1 (192.168.229.145)  
+**User:** socadmin / socadmin
 
-\*\*User:\*\* socadmin / socadmin
-
-\### 1. Mise à jour du système
+### 1. Mise à jour du système
 
 ```bash
-
-sudo apt update \&\& sudo apt upgrade -y
-
+sudo apt update && sudo apt upgrade -y
 ```
 
-\### 2. Installation du Wazuh Agent
+### 2. Installation du Wazuh Agent
 
 ```bash
+# Importer la clé GPG
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
 
-\# Importer la clé GPG
+# Ajouter le dépôt
+echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
 
-curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import \&\& chmod 644 /usr/share/keyrings/wazuh.gpg
-
-
-
-\# Ajouter le dépôt
-
-echo "deb \[signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-
-
-
-\# Installer l'agent
-
+# Installer l'agent
 sudo apt update
-
-sudo WAZUH\_MANAGER='192.168.229.146' apt install wazuh-agent -y
-
+sudo WAZUH_MANAGER='192.168.229.146' apt install wazuh-agent -y
 ```
 
-\### 3. Démarrer l'agent
+### 3. Démarrer l'agent
 
 ```bash
-
 sudo systemctl daemon-reload
-
 sudo systemctl enable wazuh-agent
-
 sudo systemctl start wazuh-agent
-
 sudo systemctl status wazuh-agent
-
 ```
 
-\### 4. Vérifier la connexion au manager
+### 4. Vérifier la connexion au manager
 
-\*\*Sur le Wazuh Manager:\*\*
+**Sur le Wazuh Manager:**
 
 ```bash
-
-sudo /var/ossec/bin/agent\_control -l
-
+sudo /var/ossec/bin/agent_control -l
 ```
 
 ---
 
-\## Installation Filebeat
+## Installation Filebeat
 
-Filebeat doit être installé sur \*\*3 VMs:\*\*
+Filebeat doit être installé sur **3 VMs:**
 
-1\. Wazuh Manager (192.168.229.146)
+1.  Wazuh Manager (192.168.229.146)
+2.  Suricata NIDS (192.168.229.147)
+3.  Elastic Stack (192.168.229.143) - optionnel
 
-2\. Suricata NIDS (192.168.229.147)
-
-3\. Elastic Stack (192.168.229.143) - optionnel
-
-\### Sur Wazuh Manager
+### Sur Wazuh Manager
 
 ```bash
-
-\# Installer Filebeat
-
+# Installer Filebeat
 sudo apt install filebeat -y
 
-
-
-\# Télécharger le module Wazuh pour Filebeat
-
+# Télécharger le module Wazuh pour Filebeat
 curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/master/extensions/elasticsearch/7.x/wazuh-template.json
 
-
-
-\# Configurer Filebeat pour envoyer à Elasticsearch
-
+# Configurer Filebeat pour envoyer à Elasticsearch
 ```
 
 Éditer `/etc/filebeat/filebeat.yml`:
 
 ```yaml
-
 output.elasticsearch:
-
-&nbsp; hosts: \["192.168.229.143:9200"]
-
-&nbsp; username: "elastic"
-
-&nbsp; password:  "YOUR\_ELASTIC\_PASSWORD"
-
-&nbsp; indices:
-
-&nbsp;   - index: "wazuh-alerts-%{+yyyy.MM.dd}"
-
-
+  hosts: ["192.168.229.143:9200"]
+  username: "elastic"
+  password: "YOUR_ELASTIC_PASSWORD"
+  indices:
+    - index: "wazuh-alerts-%{+yyyy.MM.dd}"
 
 filebeat.inputs:
-
-&nbsp; - type: log
-
-&nbsp;   enabled: true
-
-&nbsp;   paths:
-
-&nbsp;     - /var/ossec/logs/alerts/alerts.json
-
-&nbsp;   json.keys\_under\_root: true
-
+  - type: log
+    enabled: true
+    paths:
+      - /var/ossec/logs/alerts/alerts.json
+    json.keys_under_root: true
 ```
 
 ```bash
-
-\# Démarrer Filebeat
-
+# Démarrer Filebeat
 sudo systemctl enable filebeat
-
 sudo systemctl start filebeat
-
 sudo systemctl status filebeat
-
 ```
 
-\### Sur Suricata NIDS
+### Sur Suricata NIDS
 
 ```bash
-
-\# Installer Filebeat
-
+# Installer Filebeat
 sudo apt install filebeat -y
-
 ```
 
 Éditer `/etc/filebeat/filebeat.yml`:
 
 ```yaml
-
 output.elasticsearch:
-
-&nbsp; hosts: \["192.168.229.143:9200"]
-
-&nbsp; username: "elastic"
-
-&nbsp; password:  "YOUR\_ELASTIC\_PASSWORD"
-
-&nbsp; indices:
-
-&nbsp;   - index: "suricata-%{+yyyy.MM.dd}"
-
-
+  hosts: ["192.168.229.143:9200"]
+  username: "elastic"
+  password: "YOUR_ELASTIC_PASSWORD"
+  indices:
+    - index: "suricata-%{+yyyy.MM.dd}"
 
 filebeat.modules:
-
-&nbsp; - module: suricata
-
-&nbsp;   eve:
-
-&nbsp;     enabled: true
-
-&nbsp;     var.paths: \["/var/log/suricata/eve. json"]
-
+  - module: suricata
+    eve:
+      enabled: true
+      var.paths: ["/var/log/suricata/eve. json"]
 ```
 
 ```bash
-
-\# Activer le module Suricata
-
+# Activer le module Suricata
 sudo filebeat modules enable suricata
 
-
-
-\# Démarrer Filebeat
-
+# Démarrer Filebeat
 sudo systemctl enable filebeat
-
 sudo systemctl start filebeat
-
 sudo systemctl status filebeat
-
 ```
 
 ---
 
-\## Vérification Finale
+## Vérification Finale
 
-\### 1. Vérifier les indices dans Elasticsearch
+### 1. Vérifier les indices dans Elasticsearch
 
 ```bash
-
-curl -u elastic:YOUR\_PASSWORD -X GET "http://192.168.229.143:9200/\_cat/indices? v"
-
+curl -u elastic:YOUR_PASSWORD -X GET "http://192.168.229.143:9200/_cat/indices? v"
 ```
 
 Vous devriez voir:
 
-\- `wazuh-alerts-\*`
+- `wazuh-alerts-*`
+- `suricata-*`
 
-\- `suricata-\*`
-
-\### 2. Vérifier dans Kibana
+### 2. Vérifier dans Kibana
 
 Accéder à Kibana → Management → Stack Management → Index Management
 
 Vous devriez voir les indices créés.
 
-\### 3. Créer les Data Views
+### 3. Créer les Data Views
 
 Dans Kibana → Management → Stack Management → Data Views:
 
-\- Créer: `wazuh-alerts-\*`
-
-\- Créer: `suricata-\*`
+- Créer: `wazuh-alerts-*`
+- Créer: `suricata-*`
 
 ---
 
-\## Résolution des Problèmes Courants
+## Résolution des Problèmes Courants
 
-\### Elasticsearch ne démarre pas
+### Elasticsearch ne démarre pas
 
 ```bash
-
-\# Vérifier les logs
-
+# Vérifier les logs
 sudo journalctl -u elasticsearch -f
 
-
-
-\# Vérifier la configuration
-
+# Vérifier la configuration
 sudo /usr/share/elasticsearch/bin/elasticsearch --version
-
 ```
 
-\### Wazuh Agent ne se connecte pas
+### Wazuh Agent ne se connecte pas
 
 ```bash
-
-\# Sur l'agent
-
+# Sur l'agent
 sudo /var/ossec/bin/wazuh-control status
 
-
-
-\# Vérifier les logs
-
+# Vérifier les logs
 sudo tail -f /var/ossec/logs/ossec.log
-
 ```
 
-\### Filebeat ne transmet pas les logs
+### Filebeat ne transmet pas les logs
 
 ```bash
-
-\# Tester la connexion à Elasticsearch
-
+# Tester la connexion à Elasticsearch
 sudo filebeat test output
 
-
-
-\# Vérifier la configuration
-
+# Vérifier la configuration
 sudo filebeat test config
-
 ```
 
 ---
 
-\## Conclusion
+## Conclusion
 
-Toutes les composantes du Mini-SOC sont maintenant installées.
-
+Toutes les composantes du Mini-SOC sont maintenant installées.  
 Passer au guide de configuration pour finaliser le déploiement.
 
-\*\*Prochaine étape:\*\* \[02-configuration-guide.md](02-configuration-guide.md)
+**Prochaine étape:** [02-configuration-guide.md](02-configuration-guide.md)

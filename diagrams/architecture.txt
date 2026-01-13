@@ -1,0 +1,94 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    MINI-SOC ARCHITECTURE DIAGRAM
+                   Network:  192.168.229.0/24 (VMware)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              ATTACK LAYER                                    │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Kali Linux (Attacker)                                                │  │
+│  │  IP: 192.168.229.148                                                  │  │
+│  │  Tools: Nmap, Metasploit, Hydra                                       │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Attack Traffic
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           DETECTION LAYER (NIDS)                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Suricata NIDS                                                        │  │
+│  │  IP: 192.168.229.147                                                  │  │
+│  │  Function: Network Intrusion Detection                                │  │
+│  │  - Monitors network traffic                                           │  │
+│  │  - Uses Emerging Threats rules                                        │  │
+│  │  - Detects:  Port scans, malicious traffic, HTTP attacks               │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Logs via Filebeat
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           TARGET/MONITORED HOSTS                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Linux Client-1 (Monitored Host)                                      │  │
+│  │  IP: 192.168.229.145                                                  │  │
+│  │  Function:  Target system with Wazuh Agent (HIDS)                      │  │
+│  │  - Monitors:  File integrity, login attempts, system logs              │  │
+│  │  - Detects: Brute force, unauthorized access, malware                 │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Alerts to Manager
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DETECTION LAYER (HIDS Manager)                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Wazuh Manager                                                        │  │
+│  │  IP: 192.168.229.146                                                  │  │
+│  │  Function: Host Intrusion Detection System Manager                    │  │
+│  │  - Collects alerts from Wazuh agents                                  │  │
+│  │  - Performs log analysis & correlation                                │  │
+│  │  - Applies security rules                                             │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Logs via Filebeat
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       CENTRALIZATION & VISUALIZATION                         │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Elastic Stack (SIEM)                                                 │  │
+│  │  IP:  192.168.229.143                                                  │  │
+│  │  Components:                                                           │  │
+│  │  - Elasticsearch:  Log storage & indexing                              │  │
+│  │  - Kibana: Visualization & dashboard                                  │  │
+│  │  - Filebeat: Log shipping from Wazuh & Suricata                       │  │
+│  │                                                                        │  │
+│  │  Dashboards:                                                          │  │
+│  │  - Alert timeline & severity                                          │  │
+│  │  - Top attacking IPs                                                  │  │
+│  │  - Network attack signatures                                          │  │
+│  │  - Targeted ports analysis                                            │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ Accessed via Web
+                                      ▼
+                              ┌──────────────┐
+                              │ SOC Analyst  │
+                              │ (You!)       │
+                              └──────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                              DATA FLOW SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Kali Linux → Attacks → Linux Client & Network
+2. Suricata NIDS → Detects network traffic → Logs to Filebeat → Elasticsearch
+3. Wazuh Agent (Linux Client) → Detects host events → Wazuh Manager
+4. Wazuh Manager → Processes alerts → Logs to Filebeat → Elasticsearch
+5. Elasticsearch → Indexes all logs → Kibana visualizes
+6. SOC Analyst → Monitors Kibana Dashboard → Responds to alerts
+
+═══════════════════════════════════════════════════════════════════════════════

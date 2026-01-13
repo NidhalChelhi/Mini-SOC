@@ -1,0 +1,44 @@
+Mini-SOC Project Structure
+==========================
+
+Mini-SOC/
+│
+├── configs/                          # Configuration files from all VMs
+│   ├── elastic/
+│   │   ├── elasticsearch.yml         # Elasticsearch configuration
+│   │   ├── kibana.yml                # Kibana configuration
+│   │   └── filebeat.yml              # Filebeat config on Elastic VM
+│   │
+│   ├── wazuh/
+│   │   ├── ossec.conf                # Wazuh Manager configuration
+│   │   ├── filebeat.yml              # Filebeat config for Wazuh logs
+│   │   └── rules/                    # Wazuh detection rules
+│   │
+│   ├── suricata/
+│   │   ├── suricata.yaml             # Suricata NIDS configuration
+│   │   └── filebeat.yml              # Filebeat config for Suricata logs
+│   │
+│   ├── wazuh-agent/
+│   │   └── ossec.conf                # Wazuh Agent configuration
+│   │
+│   └── kibana-dashboard.ndjson       # Exported Kibana dashboard
+│
+├── docs/                             # Documentation (to be created)
+│   ├── 01-installation-guide.md
+│   ├── 02-configuration-guide.md
+│   ├── 03-testing-guide.md
+│   └── 04-user-manual.md
+│
+├── screenshots/                      # Visual documentation
+│   ├── dashboard-overview-1.png
+│   ├── dashboard-overview-2.png
+│   ├── index-management.png
+│   ├── data-views.png
+│   └── alert-detail. png
+│
+├── diagrams/                         # Architecture diagrams
+│   └── architecture.txt
+│
+├── scripts/                          # Installation/automation scripts (optional)
+│
+└── README.md                         # Main project documentation
